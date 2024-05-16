@@ -1,0 +1,10 @@
+---
+Language: Cpp
+Standard: c++20
+BasedOnStyle: LLVM
+ColumnLimit: 85
+BreakBeforeBraces: Stroustrup
+AlwaysBreakTemplateDeclarations: Yes
+SeparateDefinitionBlocks: Always
+AllowShortFunctionsOnASingleLine: None
+---
