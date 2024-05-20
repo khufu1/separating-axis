@@ -4,7 +4,6 @@ project(
   SAT
   LANGUAGES CXX)
 
-find_package(TBB REQUIRED)
 find_package(SDL3 REQUIRED)
 find_package(SDL3_image REQUIRED)
 
@@ -22,4 +21,4 @@ add_executable(sat ${SRC})
 
 target_precompile_headers(sat PRIVATE src/PCH.hpp)
 
-target_link_libraries(sat PRIVATE TBB::tbb SDL3::SDL3 SDL3_image::SDL3_image)
+target_link_libraries(sat PRIVATE SDL3::SDL3 SDL3_image::SDL3_image)

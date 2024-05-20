@@ -46,15 +46,12 @@ const std::pair<float, float> Collider::project(const std::vector<vec2f> &r,
                                                 const vec2f &axis) noexcept
 {
   std::vector<double> dots;
-  static std::mutex m;
-  // no need for a std::lock_guard ???
-  std::for_each(std::execution::par, r.begin(), r.end(), [&](const vec2f &cp) {
-    std::lock_guard _(m);
+  for (auto &cp : r) {
     dots.push_back(cp.dot(axis));
-  });
+  };
   // TODO - improve this
-  return {*std::min_element(std::execution::par, dots.begin(), dots.end()),
-          *std::max_element(std::execution::par, dots.begin(), dots.end())};
+  return {*std::min_element(dots.begin(), dots.end()),
+          *std::max_element(dots.begin(), dots.end())};
 }
 
 // true if overlapping false otherwise

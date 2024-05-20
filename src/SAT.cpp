@@ -1,7 +1,6 @@
 #include "Collider.hpp"
 #include "global.h"
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_hints.h>
 #include <SDL3_image/SDL_image.h>
 
 using namespace sat;

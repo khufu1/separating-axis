@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PCH.hpp"
+#include "PCH.hpp" // IWYU pragma: export
 
 #if defined(__GNUC__)
 #define FORCE_INLINE_ __attribute__((always_inline)) inline

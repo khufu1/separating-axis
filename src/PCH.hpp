@@ -6,11 +6,9 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
-#include <execution>
 #include <filesystem>
 #include <format>
 #include <iostream>
-#include <mutex>
 #include <numbers>
 #include <stdexcept>
 #include <string>

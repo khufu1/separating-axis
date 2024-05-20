@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Drawing.hpp"
-#include "PCH.hpp"
+#include "global.h" // IWYU pragma: export
 #include "vec2.hpp"
 #include <SDL3/SDL.h>
 

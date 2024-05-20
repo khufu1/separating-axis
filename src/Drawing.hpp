@@ -1,6 +1,5 @@
 #pragma once
 
-#include "PCH.hpp"
 #include "global.h"
 #include "vec2.hpp"
 #include <SDL3/SDL.h>

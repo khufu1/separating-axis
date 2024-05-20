@@ -1,6 +1,5 @@
 #pragma once
 
-#include "PCH.hpp"
 #include "global.h"
 
 #define RADIANS(A) (A * std::numbers::pi) / 180
