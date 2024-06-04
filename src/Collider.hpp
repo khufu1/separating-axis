@@ -17,11 +17,9 @@ public:
 private:
   const vec2f computeEdgeNormal(const vec2f &pointA, const vec2f &pointB) noexcept;
   const std::vector<vec2f> computeAllNormals(const std::vector<vec2f> &r) noexcept;
-  const std::pair<float, float> project(const std::vector<vec2f> &r,
-                                        const vec2f &axis) noexcept;
+  const vec2f project(const std::vector<vec2f> &r, const vec2f &axis) noexcept;
   // true if overlapping false otherwise
-  bool overlap(const std::pair<float, float> &projection1,
-               const std::pair<float, float> &projection2) noexcept;
+  bool overlap(const vec2f &projection1, const vec2f &projection2) noexcept;
   bool SAT(const std::vector<vec2f> &r1, const std::vector<vec2f> &r2) noexcept;
 };
 

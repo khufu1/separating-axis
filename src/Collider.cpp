@@ -42,27 +42,34 @@ Collider::computeAllNormals(const std::vector<vec2f> &r) noexcept
   return normals;
 }
 
-const std::pair<float, float> Collider::project(const std::vector<vec2f> &r,
-                                                const vec2f &axis) noexcept
+const vec2f Collider::project(const std::vector<vec2f> &r,
+                              const vec2f &axis) noexcept
 {
-  std::vector<double> dots;
+  float min = r.at(0).dot(axis);
+  float max = min;
+  float projection;
+
   for (auto &cp : r) {
-    dots.push_back(cp.dot(axis));
-  };
-  // TODO - improve this
-  return {*std::min_element(dots.begin(), dots.end()),
-          *std::max_element(dots.begin(), dots.end())};
+    projection = cp.dot(axis);
+
+    if (projection > max) {
+      max = projection;
+    }
+    if (projection < min) {
+      min = projection;
+    }
+  }
+  return {min, max};
 }
 
 // true if overlapping false otherwise
-FORCE_INLINE_ bool
-Collider::overlap(const std::pair<float, float> &projection1,
-                  const std::pair<float, float> &projection2) noexcept
+FORCE_INLINE_ bool Collider::overlap(const vec2f &projection1,
+                                     const vec2f &projection2) noexcept
 {
-  return std::min(projection1.first, projection1.second) <
-             std::max(projection2.first, projection2.second) &&
-         std::min(projection2.first, projection2.second) <
-             std::max(projection1.first, projection1.second);
+  return std::min(projection1.x, projection1.y) <
+             std::max(projection2.x, projection2.y) &&
+         std::min(projection2.x, projection2.y) <
+             std::max(projection1.x, projection1.y);
 }
 
 bool Collider::SAT(const std::vector<vec2f> &r1,
@@ -74,8 +81,8 @@ bool Collider::SAT(const std::vector<vec2f> &r1,
 
 loop:
   for (auto n : normals) {
-    std::pair p1 = project(r1, n);
-    std::pair p2 = project(r2, n);
+    vec2f p1 = project(r1, n);
+    vec2f p2 = project(r2, n);
 
     overlapping = overlap(p1, p2);
     if (!overlapping)
