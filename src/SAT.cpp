@@ -2,6 +2,7 @@
 #include "global.h"
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
+#include <cstdlib>
 
 using namespace sat;
 using namespace math;
@@ -11,17 +12,7 @@ SDL_Renderer *renderer;
 SDL_Event event;
 bool windowShouldOpen{true};
 
-class Convex : public Collider {
-public:
-  using Collider::Collider;
-
-  void display() noexcept override
-  {
-    blit(renderer);
-  }
-};
-
-Convex *r1Ptr, *r2Ptr;
+Collider *r1Ptr, *r2Ptr;
 
 static void handleEvents() noexcept;
 
@@ -34,10 +25,10 @@ int main()
                               &renderer);
   SDL_SetRenderVSync(renderer, true);
 
-  Convex::loadTextures(renderer, "assets/");
-  Convex r1{Shapes::Triangle, Drawing::getTexturePtr("rectGreen")};
+  Collider::loadTextures(renderer, "assets/");
+  Collider r1{Shapes::Triangle, Drawing::getTexturePtr("rectGreen")};
   r1.setVertices({{400, 400}, {600, 400}, {400, 600}});
-  Convex r2{Shapes::Rectangle, Drawing::getTexturePtr("rectWhite")};
+  Collider r2{Shapes::Rectangle, Drawing::getTexturePtr("rectWhite")};
   r2.setVertices({{200, 200}, {400, 200}, {400, 400}, {200, 400}});
   LOG_IF(!r1.texture() || !r2.texture(), "Couldnt load textures \n");
   r1Ptr = &r1;
@@ -46,15 +37,15 @@ int main()
   while (windowShouldOpen) {
     SDL_RenderClear(renderer);
     handleEvents();
-    Convex::renderScene();
+    Drawing::renderScene(renderer);
     SDL_RenderPresent(renderer);
   }
-  Convex::destroyTextures();
+  Collider::destroyTextures();
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   IMG_Quit();
   SDL_Quit();
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 static void handleEvents() noexcept
@@ -67,38 +58,39 @@ static void handleEvents() noexcept
   static bool rShift{false};
 
   while (SDL_PollEvent(&event)) {
+    SDL_Scancode key = event.key.scancode;
     switch (event.type) {
     case SDL_EVENT_QUIT:
       windowShouldOpen = false;
       break;
-    case SDL_EVENT_KEY_DOWN: // no need to perfectly handle events
-      if (event.key.keysym.scancode == SDL_SCANCODE_LSHIFT)
+    case SDL_EVENT_KEY_DOWN:
+      if (key == SDL_SCANCODE_LSHIFT)
         lShift = true;
-      if (event.key.keysym.scancode == SDL_SCANCODE_RSHIFT)
+      if (key == SDL_SCANCODE_RSHIFT)
         rShift = true;
-      if (event.key.keysym.scancode == SDL_SCANCODE_LEFT)
+      if (key == SDL_SCANCODE_LEFT)
         left = true;
-      if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
+      if (key == SDL_SCANCODE_RIGHT)
         right = true;
-      if (event.key.keysym.scancode == SDL_SCANCODE_UP)
+      if (key == SDL_SCANCODE_UP)
         up = true;
-      if (event.key.keysym.scancode == SDL_SCANCODE_DOWN)
+      if (key == SDL_SCANCODE_DOWN)
         down = true;
-      if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+      if (key == SDL_SCANCODE_ESCAPE)
         windowShouldOpen = false;
       break;
-    case SDL_EVENT_KEY_UP: // no need to perfectly handle events
-      if (event.key.keysym.scancode == SDL_SCANCODE_LSHIFT)
+    case SDL_EVENT_KEY_UP:
+      if (key == SDL_SCANCODE_LSHIFT)
         lShift = false;
-      if (event.key.keysym.scancode == SDL_SCANCODE_RSHIFT)
+      if (key == SDL_SCANCODE_RSHIFT)
         rShift = false;
-      if (event.key.keysym.scancode == SDL_SCANCODE_LEFT)
+      if (key == SDL_SCANCODE_LEFT)
         left = false;
-      if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
+      if (key == SDL_SCANCODE_RIGHT)
         right = false;
-      if (event.key.keysym.scancode == SDL_SCANCODE_UP)
+      if (key == SDL_SCANCODE_UP)
         up = false;
-      if (event.key.keysym.scancode == SDL_SCANCODE_DOWN)
+      if (key == SDL_SCANCODE_DOWN)
         down = false;
       break;
     default:
@@ -108,35 +100,25 @@ static void handleEvents() noexcept
 
   if (lShift) {
     r1Ptr->rotate(3, r1Ptr->center());
-    // std::cout << r1Ptr->vertices();
   }
   if (rShift) {
     r2Ptr->rotate(3, r2Ptr->center());
-    // std::cout << "2" << r2Ptr->vertices();
   }
   if (left) {
-    // std::cout << r1Ptr->vertices();
     r1Ptr->translate({-1, 0});
   }
   if (right) {
-    // std::cout << r1Ptr->vertices();
     r1Ptr->translate({1, 0});
   }
   if (up) {
-    // std::cout << r1Ptr->vertices();
     r1Ptr->translate({0, -1});
   }
   if (down) {
-    // std::cout << r1Ptr->vertices();
     r1Ptr->translate({0, 1});
   }
 
   if (r1Ptr->collidingWith(*r2Ptr)) {
     r2Ptr->setTexture(Drawing::getTexturePtr("rectCollide"));
-    // std::cout << "1" << r1Ptr->angle() << std::endl;
-    // std::cout << "2" << r2Ptr->angle() << std::endl;
-    // std::cout << "1" << r1Ptr->vertices();
-    // std::cout << "2" << r2Ptr->vertices();
   }
   else {
     r2Ptr->setTexture(Drawing::getTexturePtr("rectWhite"));

@@ -62,11 +62,6 @@ void Drawing::setTexture(SDL_Texture *texture) noexcept
   TexturePtr = texture;
 }
 
-void Drawing::setInterval(float i) noexcept
-{
-  Interval = i;
-}
-
 void Drawing::setVertices(std::vector<vec2f> v) noexcept
 {
   if (v.size() == Vertices.size()) {
@@ -100,11 +95,6 @@ SDL_Texture *Drawing::texture() const noexcept
 double Drawing::angle() const noexcept
 {
   return Angle;
-}
-
-float Drawing::interval() const noexcept
-{
-  return Interval;
 }
 
 const std::vector<vec2f> &Drawing::vertices() const noexcept

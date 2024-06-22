@@ -20,7 +20,7 @@ namespace sat {
   When rendering a rectangle set vertices in this order {{A}, {B} ,{C} ,{D}}
   so that the Element buffer work correctly
 */
-enum class Shapes : uint8_t { Triangle, Rectangle };
+enum class Shapes { Triangle, Rectangle };
 
 // An Drawing default shape is a recangle
 
@@ -37,11 +37,9 @@ public:
   static void setScaleMode(SDL_Texture *t, SDL_ScaleMode m) noexcept;
 
   void setTexture(SDL_Texture *texture) noexcept;
-  void setInterval(float i) noexcept;
   void setVertices(std::vector<vec2f> v) noexcept;
 
   [[nodiscard]] SDL_Texture *texture() const noexcept;
-  [[nodiscard]] float interval() const noexcept;
   [[nodiscard]] double angle() const noexcept;
   [[nodiscard]] const vec2f center() const noexcept;
   [[nodiscard]] const std::vector<vec2f> &vertices() const noexcept;
@@ -49,16 +47,12 @@ public:
   void translate(vec2f v) noexcept;
   void rotate(double a, vec2f center) noexcept;
 
-  // each object has a unique way of being displayed (animations ,
-  // multitexture ,...)
-  virtual void display() noexcept = 0;
-
   static inline std::vector<Drawing *> Drawings;
 
-  static FORCE_INLINE_ void renderScene() noexcept
+  static FORCE_INLINE_ void renderScene(SDL_Renderer *r) noexcept
   {
     for (auto &d : Drawings)
-      d->display();
+      d->blit(r);
   }
 
 protected:
@@ -66,7 +60,6 @@ protected:
   void setStaticVertexData() noexcept;
   void setDynamicVertexData() noexcept;
 
-  // idk why
 private:
   template <Shapes T>
   void blit(SDL_Renderer *renderer) noexcept;
@@ -76,10 +69,8 @@ private:
   void setDynamicVertexData() noexcept;
 
 protected:
-  std::string ClassName;
   Shapes Shape;
   SDL_Texture *TexturePtr;
-  float Interval{130.0f};
   double Angle{0.0f};
   std::vector<vec2f> Vertices;
 
