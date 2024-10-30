@@ -18,7 +18,7 @@ static void handleEvents() noexcept;
 
 int main()
 {
-  LOG_IF(SDL_Init(SDL_INIT_VIDEO) != 0, "COULDNT INIT SDL \n");
+  LOG_IF(SDL_Init(SDL_INIT_VIDEO) != true, "COULDNT INIT SDL \n");
   LOG_IF(IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG, "COULDNT INIT IMG \n");
 
   SDL_CreateWindowAndRenderer("SAT", 600, 600, SDL_WINDOW_RESIZABLE, &window,

@@ -1,5 +1,4 @@
-#ifndef PCH_HPP______________________________
-#define PCH_HPP______________________________
+#pragma once
 
 // std
 #include <algorithm>
@@ -15,5 +14,3 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-
-#endif

@@ -22,17 +22,14 @@ namespace sat {
 */
 enum class Shapes { Triangle, Rectangle };
 
-// An Drawing default shape is a recangle
-
 class Drawing {
 public:
-  Drawing(Shapes shape, SDL_Texture *texture = nullptr) noexcept;
+  Drawing(Shapes shape = Shapes::Triangle, SDL_Texture *texture = nullptr) noexcept;
   ~Drawing() = default;
 
-  inline static std::unordered_map<std::string, SDL_Texture *> Textures;
   static void loadTextures(SDL_Renderer *renderer, std::string directory) noexcept;
   static void destroyTextures() noexcept;
-  static SDL_Texture *getTexturePtr(std::string name) noexcept;
+  [[nodiscard]] static SDL_Texture *getTexturePtr(std::string name) noexcept;
   static void setBlendMode(SDL_Texture *t, SDL_BlendMode m) noexcept;
   static void setScaleMode(SDL_Texture *t, SDL_ScaleMode m) noexcept;
 
@@ -47,8 +44,6 @@ public:
   void translate(vec2f v) noexcept;
   void rotate(double a, vec2f center) noexcept;
 
-  static inline std::vector<Drawing *> Drawings;
-
   static FORCE_INLINE_ void renderScene(SDL_Renderer *r) noexcept
   {
     for (auto &d : Drawings)
@@ -57,16 +52,10 @@ public:
 
 protected:
   void blit(SDL_Renderer *renderer) noexcept;
-  void setStaticVertexData() noexcept;
   void setDynamicVertexData() noexcept;
 
 private:
-  template <Shapes T>
-  void blit(SDL_Renderer *renderer) noexcept;
-  template <Shapes T>
-  void setStaticVertexData() noexcept;
-  template <Shapes T>
-  void setDynamicVertexData() noexcept;
+  static constexpr bool setStaticVertexData() noexcept;
 
 protected:
   Shapes Shape;
@@ -75,16 +64,10 @@ protected:
   std::vector<vec2f> Vertices;
 
 private:
-  static inline std::vector<SDL_Vertex> TextureVertices;
-  static inline std::vector<int> TextureVertexIndices;
+  static inline std::unordered_map<std::string, SDL_Texture *> Textures;
+  static inline std::vector<Drawing *> Drawings;
+  static inline std::array<SDL_Vertex, 4> TextureVertices;
+  static inline std::array<int, 6> TextureVertexIndices;
 };
-
-#include "Drawing.inl"
-
-inline void operator<<(std::ostream &s, std::vector<vec2f> v)
-{
-  for (auto &p : v)
-    s << p;
-}
 
 } // namespace sat

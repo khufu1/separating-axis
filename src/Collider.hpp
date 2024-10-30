@@ -12,7 +12,7 @@ namespace sat {
 class Collider : public Drawing {
 public:
   using Drawing::Drawing;
-  [[nodiscard]] bool collidingWith(Collider &c) noexcept;
+  [[nodiscard]] bool collidingWith(const Collider &c) noexcept;
 
 private:
   const vec2f computeEdgeNormal(const vec2f &pointA, const vec2f &pointB) noexcept;

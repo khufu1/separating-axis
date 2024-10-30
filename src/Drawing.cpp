@@ -7,21 +7,13 @@
 namespace sat {
 
 Drawing::Drawing(Shapes shape, SDL_Texture *texture) noexcept
-    : Shape{shape}, TexturePtr{texture}
+    : Shape(shape), TexturePtr(texture)
 {
-  switch (shape) {
-  case Shapes::Rectangle:
-    Vertices.resize(4);
-    TextureVertices.resize(4);
-    TextureVertexIndices.resize(6);
-    break;
-  case Shapes::Triangle:
+  [[maybe_unused]] static bool _ = Drawing::setStaticVertexData();
+  if (shape == Shapes::Triangle)
     Vertices.resize(3);
-    TextureVertices.resize(3);
-    TextureVertexIndices.resize(3);
-    break;
-  }
-  setStaticVertexData();
+  else
+    Vertices.resize(4);
   Drawings.push_back(this);
 }
 
@@ -34,7 +26,6 @@ void Drawing::loadTextures(SDL_Renderer *renderer, std::string directory) noexce
     if (dirEntry.is_regular_file() &&
         dirEntry.path().filename().extension() == ".png") [[likely]] {
       dNode.first = dirEntry.path().filename().string();
-      // FIXME - fix wchar c_str on windows u can load each one individualy
       dNode.second =
           IMG_LoadTexture(renderer, dirEntry.path().relative_path().c_str());
 
@@ -64,13 +55,10 @@ void Drawing::setTexture(SDL_Texture *texture) noexcept
 
 void Drawing::setVertices(std::vector<vec2f> v) noexcept
 {
-  if (v.size() == Vertices.size()) {
+  if (v.size() == Vertices.size())
     Vertices = v;
-  }
-  else {
-    print("Wrong vertices num BOZO\n");
-    exit(EXIT_FAILURE);
-  }
+  else
+    print("Wrong vertices num \n");
 
   if (Angle != 0.0f) {
     rotate(Angle, center());
@@ -79,12 +67,12 @@ void Drawing::setVertices(std::vector<vec2f> v) noexcept
 
 void Drawing::setBlendMode(SDL_Texture *t, SDL_BlendMode m) noexcept
 {
-  LOG_IF(SDL_SetTextureBlendMode(t, m) < 0, "Couldnt set texture blend mode ");
+  LOG_IF(SDL_SetTextureBlendMode(t, m) != true, "Couldnt set texture blend mode.");
 }
 
 void Drawing::setScaleMode(SDL_Texture *t, SDL_ScaleMode m) noexcept
 {
-  LOG_IF(SDL_SetTextureScaleMode(t, m) < 0, "Couldnt set texture scale mode ");
+  LOG_IF(SDL_SetTextureScaleMode(t, m) != true, "Couldnt set texture scale mode.");
 }
 
 SDL_Texture *Drawing::texture() const noexcept
@@ -118,8 +106,7 @@ try {
   return Textures.at(name + ".png");
 }
 catch (std::out_of_range &e) {
-  print("Wrong Name : {} \n", name);
-  print("{} \n", e.what());
+  print("Wrong Texture Name : {} \n", name);
   return nullptr;
 }
 
@@ -138,39 +125,67 @@ void Drawing::rotate(double a, vec2f center) noexcept
   }
 }
 
-void Drawing::blit(SDL_Renderer *renderer) noexcept
+constexpr bool Drawing::setStaticVertexData() noexcept
 {
-  switch (Shape) {
-  case Shapes::Rectangle:
-    blit<Shapes::Rectangle>(renderer);
-    break;
-  case Shapes::Triangle:
-    blit<Shapes::Triangle>(renderer);
-    break;
-  }
-}
-
-void Drawing::setStaticVertexData() noexcept
-{
-  switch (Shape) {
-  case Shapes::Rectangle:
-    setStaticVertexData<Shapes::Rectangle>();
-    break;
-  case Shapes::Triangle:
-    setStaticVertexData<Shapes::Triangle>();
-    break;
-  }
+  // A
+  TextureVertices[0].color.r = 1.0f;
+  TextureVertices[0].color.g = 1.0f;
+  TextureVertices[0].color.b = 1.0f;
+  TextureVertices[0].color.a = 1.0f;
+  TextureVertices[0].tex_coord.x = 0.0f;
+  TextureVertices[0].tex_coord.y = 0.0f;
+  // B
+  TextureVertices[1].color.r = 1.0f;
+  TextureVertices[1].color.g = 1.0f;
+  TextureVertices[1].color.b = 1.0f;
+  TextureVertices[1].color.a = 1.0f;
+  TextureVertices[1].tex_coord.x = 1.0f;
+  TextureVertices[1].tex_coord.y = 0.0f;
+  // C
+  TextureVertices[2].color.r = 1.0f;
+  TextureVertices[2].color.g = 1.0f;
+  TextureVertices[2].color.b = 1.0f;
+  TextureVertices[2].color.a = 1.0f;
+  TextureVertices[2].tex_coord.x = 1.0f;
+  TextureVertices[2].tex_coord.y = 1.0f;
+  // D
+  TextureVertices[3].color.r = 1.0f;
+  TextureVertices[3].color.g = 1.0f;
+  TextureVertices[3].color.b = 1.0f;
+  TextureVertices[3].color.a = 1.0f;
+  TextureVertices[3].tex_coord.x = 0.0f;
+  TextureVertices[3].tex_coord.y = 1.0f;
+  // similar to opengl's EBO
+  TextureVertexIndices = {0, 1, 2,  // first triangle
+                          0, 3, 2}; // second triangle}
+  return true;
 }
 
 void Drawing::setDynamicVertexData() noexcept
 {
-  switch (Shape) {
-  case Shapes::Rectangle:
-    setDynamicVertexData<Shapes::Rectangle>();
-    break;
-  case Shapes::Triangle:
-    setDynamicVertexData<Shapes::Triangle>();
-    break;
+  if (Shape == Shapes::Rectangle) {
+    TextureVertices[0].position = {Vertices[0].x, Vertices[0].y};
+    TextureVertices[1].position = {Vertices[1].x, Vertices[1].y};
+    TextureVertices[2].position = {Vertices[2].x, Vertices[2].y};
+    TextureVertices[3].position = {Vertices[3].x, Vertices[3].y};
+  }
+  else {
+    TextureVertices[0].position = {Vertices[0].x, Vertices[0].y};
+    TextureVertices[1].position = {Vertices[1].x, Vertices[1].y};
+    TextureVertices[2].position = {Vertices[2].x, Vertices[2].y};
+  }
+}
+
+void Drawing::blit(SDL_Renderer *renderer) noexcept
+{
+  setDynamicVertexData();
+  if (Shape == Shapes::Rectangle) {
+    SDL_RenderGeometry(renderer, TexturePtr, TextureVertices.data(), 4,
+                       TextureVertexIndices.data(), 6);
+  }
+  else {
+    SDL_RenderGeometry(renderer, TexturePtr, TextureVertices.data(), 3,
+                       TextureVertexIndices.data(), 3);
   }
 }
 

@@ -7,8 +7,8 @@
 namespace math {
 
 template <typename T>
+  requires std::is_arithmetic_v<T>
 struct vec2 {
-  static_assert(std::is_arithmetic<T>(), "Only arithmetic types allowed!!");
   T x;
   T y;
 
@@ -67,14 +67,14 @@ struct vec2 {
   {
     *this = {*this - v};
   }
+
+  friend std::ostream &operator<<(std::ostream &s, vec2<T> &v)
+  {
+    s << std::format("<{},{}>", v.x, v.y);
+    return s;
+  }
 };
 
 using vec2f = vec2<float>;
-
-template <typename T>
-FORCE_INLINE_ void operator<<(std::ostream &s, vec2<T> &v)
-{
-  s << std::format("<{},{}>", v.x, v.y) << std::endl;
-}
 
 } // namespace math
